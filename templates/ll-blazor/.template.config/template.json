@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Lorenzo Lanuza",
+  "classifications": [
+    "Web",
+    "Blazor",
+    "WebAssembly"
+  ],
+  "identity": "LL.Blazor.Template",
+  "name": "Blazor WebAssembly con la línea base",
+  "description": "Aplicación Blazor WebAssembly en .NET 10 con pruebas, CI de core y contenedor nginx sin privilegios.",
+  "shortName": "ll-blazor",
+  "sourceName": "CompanyWeb",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}

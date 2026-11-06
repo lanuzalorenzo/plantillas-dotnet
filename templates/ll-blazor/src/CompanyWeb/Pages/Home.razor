@@ -1,0 +1,42 @@
+@page "/"
+@inject ApiClient Api
+
+<PageTitle>CompanyWeb</PageTitle>
+
+<h1>CompanyWeb</h1>
+<p>Aplicación Blazor WebAssembly creada desde la plantilla.</p>
+
+@if (_cargando)
+{
+  <p role="status">Consultando la API…</p>
+}
+else if (_mensaje is not null)
+{
+  <p role="status">@_mensaje</p>
+}
+else if (_error)
+{
+  <p role="alert">No se ha podido consultar la API. Revisa <code>ApiBaseUrl</code> y que el servicio esté arrancado.</p>
+}
+
+@code {
+  private bool _cargando = true;
+  private bool _error;
+  private string? _mensaje;
+
+  protected override async Task OnInitializedAsync()
+  {
+    try
+    {
+      _mensaje = await Api.ObtenerSaludoAsync();
+    }
+    catch (Exception excepcion) when (excepcion is HttpRequestException or JsonException or TaskCanceledException)
+    {
+      _error = true;
+    }
+    finally
+    {
+      _cargando = false;
+    }
+  }
+}
