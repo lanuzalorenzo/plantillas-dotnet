@@ -16,7 +16,9 @@ concurrency:
 
 jobs:
   template:
-    name: Plantillas .NET
+    # «Plantilla de API» es el nombre del check obligatorio de main; el trabajo
+    # verifica todas las plantillas desde que entró ll-blazor.
+    name: Plantilla de API
     runs-on: ubuntu-latest
     permissions:
       contents: read
