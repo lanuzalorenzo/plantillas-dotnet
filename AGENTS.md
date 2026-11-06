@@ -6,14 +6,14 @@ Plantillas de `dotnet new` que crean repositorios con la línea base del portfol
 
 - `templates/<nombre>/`: una plantilla. El contenido generado está en la raíz de la carpeta y la definición en `.template.config/template.json`.
 - `assets/iconos/`: icono del repositorio, con los valores en línea.
-- `scripts/verify-template.sh`: instala la plantilla en un directorio temporal, genera el proyecto, restaura, compila, prueba y verifica el formato.
+- `scripts/verify-template.sh`: recorre las plantillas, instala cada una en un directorio temporal, genera el proyecto, restaura, compila, prueba y verifica el formato.
 - `.github/workflows/`: CI del repositorio y flujo de auto-merge de Dependabot.
 
 ## Reglas
 
 - Una plantilla no duplica la lógica de `shared-dotnet`: la consume por versión publicada.
 - El contenido generado no cita repositorios privados, rutas del workspace ni documentos internos.
-- Sin secretos ni credenciales versionadas. El `NuGet.config` lee `GITHUB_TOKEN` del entorno.
+- Sin secretos ni credenciales versionadas. En `templates/ll-api`, el `NuGet.config` lee `GITHUB_TOKEN` del entorno; `templates/ll-blazor` solo usa nuget.org.
 - La línea base de los repos públicos se aplica aquí sin excepción: Gitleaks sobre el historial completo, Dependabot con auto-merge de parche y minor, permisos mínimos y `main` con rama y pull request.
 - Una plantilla nueva entra con su recorrido de verificación. Una plantilla que no puede generar, compilar y probar un proyecto no se publica.
 - Las comprobaciones de seguridad no se relajan para que una plantilla pase.
