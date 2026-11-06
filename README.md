@@ -11,7 +11,7 @@ Una plantilla no es un control que la aplicación instala: es el esqueleto que l
 | Nombre corto | Qué crea | Estado |
 |---|---|---|
 | `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validada en local y CI |
-| `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Validada en local |
+| `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Validada en local y CI |
 
 La plantilla de paquete NuGet entra cuando la de Blazor esté probada de extremo a extremo.
 
