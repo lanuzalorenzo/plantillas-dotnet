@@ -16,13 +16,11 @@ concurrency:
 
 jobs:
   template:
-    name: Plantilla de API
+    name: Plantillas .NET
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: read
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v7
@@ -33,7 +31,32 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Generar, compilar y probar la plantilla
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./scripts/verify-template.sh
+
+  template-docker:
+    name: Contenedor de la plantilla Blazor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Generar la plantilla
+        run: |
+          dotnet new install ./templates/ll-blazor
+          dotnet new ll-blazor -n SampleWeb -o /tmp/sample-web
+
+      - name: Construir la imagen
+        run: docker build -t sample-web /tmp/sample-web
+
+      - name: Comprobar la configuración de nginx
+        run: docker run --rm sample-web nginx -t
 
   secret-scanning:
     name: Detección de secretos (historial completo)
