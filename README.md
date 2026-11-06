@@ -1,3 +1,5 @@
+<img src="assets/iconos/plantillas-dotnet.svg" width="64" alt="Icono de plantillas-dotnet">
+
 # Plantillas .NET del portfolio
 
 Plantillas de `dotnet new` que crean un repositorio con la línea base ya puesta: solución por capas, compilación centralizada, controles compartidos de [`shared-dotnet`](https://github.com/lanuzalorenzo/shared-dotnet), CI sobre las acciones de [`core`](https://github.com/lanuzalorenzo/core) y Dockerfile sin privilegios.
