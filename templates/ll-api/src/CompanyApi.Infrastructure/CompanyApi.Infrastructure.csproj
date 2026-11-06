@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\CompanyApi.Application\CompanyApi.Application.csproj" />
+    <ProjectReference Include="..\CompanyApi.Domain\CompanyApi.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

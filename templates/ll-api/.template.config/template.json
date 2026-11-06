@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Lorenzo Lanuza",
+  "classifications": [
+    "Web",
+    "API",
+    "Cloud"
+  ],
+  "identity": "LL.Api.Template",
+  "name": "API .NET con controles compartidos",
+  "description": "API ASP.NET Core por capas con los controles de shared-dotnet, CI de core y Dockerfile sin privilegios.",
+  "shortName": "ll-api",
+  "sourceName": "CompanyApi",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}

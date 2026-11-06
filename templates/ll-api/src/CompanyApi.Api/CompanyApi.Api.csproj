@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="LL.Hosting" />
+    <PackageReference Include="LL.Security" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CompanyApi.Application\CompanyApi.Application.csproj" />
+    <ProjectReference Include="..\CompanyApi.Infrastructure\CompanyApi.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
