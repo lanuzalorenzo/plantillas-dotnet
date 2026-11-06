@@ -45,6 +45,6 @@ docker build --secret id=github_token,env=GITHUB_TOKEN -t company-api .
 docker run --rm -p 8080:8080 company-api
 ```
 
-El contenedor ejecuta con usuario no privilegiado y escucha HTTP en el 8080. La redirección a HTTPS y HSTS se activan fuera de Development cuando hay un puerto HTTPS configurado; en el contenedor la terminación TLS corresponde al host o a la plataforma, así que no hay redirección dentro de la imagen.
+El contenedor ejecuta con usuario no privilegiado y escucha HTTP en el 8080. La redirección a HTTPS se aplica en cualquier entorno salvo `Testing` cuando hay un puerto HTTPS configurado; HSTS se añade fuera de Development. En el contenedor no hay puerto HTTPS: la terminación TLS corresponde al host o a la plataforma, así que la imagen no redirige por sí sola.
 
 Licencia: MIT.

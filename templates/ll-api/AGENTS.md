@@ -14,7 +14,7 @@ API empresarial en .NET 10 creada desde la plantilla `ll-api`. Este archivo cubr
 - Los controles compartidos se consumen desde `LL.Security` y `LL.Hosting`; no los reimplementes en el host.
 - CORS con denegación por defecto y orígenes explícitos.
 - Dockerfile con usuario no privilegiado (`USER $APP_UID`).
-- Sin secretos ni cadenas reales en el código: `appsettings.Development.json` (ignorado), user-secrets o variables de entorno.
+- Sin secretos ni cadenas reales en el código: `appsettings.Local.json` (ignorado), user-secrets o variables de entorno. `appsettings.Development.json` se versiona sin secretos.
 - Pruebas de integración en `tests/CompanyApi.Tests` para cualquier cambio de comportamiento.
 
 ## Verificación
