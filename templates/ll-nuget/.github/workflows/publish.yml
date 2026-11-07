@@ -1,0 +1,65 @@
+name: Publicar paquete
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Empaquetar y publicar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolver la versión desde la etiqueta
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "La etiqueta debe tener la forma vX.Y.Z: $TAG" >&2
+            exit 1
+          fi
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Restaurar dependencias
+        run: dotnet restore CompanyPackage.slnx
+
+      - name: Compilar con la versión de la etiqueta
+        run: >
+          dotnet build CompanyPackage.slnx
+          -c Release --no-restore
+          -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Ejecutar pruebas antes de publicar
+        run: dotnet test CompanyPackage.slnx -c Release --no-build --no-restore
+
+      - name: Empaquetar
+        run: >
+          dotnet pack CompanyPackage.slnx
+          -c Release --no-build
+          -p:Version=${{ steps.version.outputs.version }}
+          -o "$RUNNER_TEMP/paquetes"
+
+      - name: Publicar en GitHub Packages
+        run: |
+          set -euo pipefail
+          nupkg="$(find "$RUNNER_TEMP/paquetes" -name '*.nupkg' -print -quit)"
+          dotnet nuget push "$nupkg" \
+            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --skip-duplicate
