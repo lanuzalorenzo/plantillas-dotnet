@@ -12,6 +12,18 @@
   "shortName": "ll-blazor",
   "sourceName": "CompanyWeb",
   "preferNameDirectory": true,
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**"
+          ]
+        }
+      ]
+    }
+  ],
   "tags": {
     "language": "C#",
     "type": "project"

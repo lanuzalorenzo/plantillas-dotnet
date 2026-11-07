@@ -16,6 +16,7 @@ Plantillas de `dotnet new` que crean repositorios con la línea base del portfol
 - Sin secretos ni credenciales versionadas. En `templates/ll-api`, el `NuGet.config` lee `GITHUB_TOKEN` del entorno; `templates/ll-blazor` solo usa nuget.org.
 - La línea base de los repos públicos se aplica aquí sin excepción: Gitleaks sobre el historial completo, Dependabot con auto-merge de parche y minor, permisos mínimos y `main` con rama y pull request.
 - Una plantilla nueva entra con su recorrido de verificación. Una plantilla que no puede generar, compilar y probar un proyecto no se publica.
+- Un proyecto que se declare publicable se comprueba además con `dotnet pack`; el recorrido falla si el `.nupkg` no contiene la biblioteca.
 - Las comprobaciones de seguridad no se relajan para que una plantilla pase.
 
 ## Verificación

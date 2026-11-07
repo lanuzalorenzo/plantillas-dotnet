@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Lorenzo Lanuza",
+  "classifications": [
+    "Library",
+    "NuGet"
+  ],
+  "identity": "LL.NuGet.Template",
+  "name": "Biblioteca NuGet con la línea base",
+  "description": "Biblioteca .NET 10 empaquetable con pruebas, CI de core y publicación por etiqueta en GitHub Packages.",
+  "shortName": "ll-nuget",
+  "sourceName": "CompanyPackage",
+  "preferNameDirectory": true,
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**"
+          ]
+        }
+      ]
+    }
+  ],
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}
