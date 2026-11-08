@@ -35,6 +35,7 @@ jobs:
       - name: Generar, compilar y probar la plantilla
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./scripts/verify-template.sh
 
   template-docker:

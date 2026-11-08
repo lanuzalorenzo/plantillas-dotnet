@@ -15,7 +15,8 @@ La regla de dependencias es `Domain ← Application ← Infrastructure ← Api`.
 ## Puesta en marcha
 
 ```bash
-export GITHUB_TOKEN="$(gh auth token)"
+# PAT de solo lectura (read:packages) para el feed privado; no uses el token de gh.
+export GH_PACKAGES_TOKEN="<pat-de-solo-lectura>"
 dotnet restore CompanyApi.slnx
 dotnet run --project src/CompanyApi.Api
 ```
@@ -41,7 +42,7 @@ El CI llama a las acciones de [`core`](https://github.com/lanuzalorenzo/core) y 
 ## Docker
 
 ```bash
-docker build --secret id=github_token,env=GITHUB_TOKEN -t company-api .
+docker build --secret id=github_token,env=GH_PACKAGES_TOKEN -t company-api .
 docker run --rm -p 8080:8080 company-api
 ```
 
