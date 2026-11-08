@@ -29,10 +29,10 @@ dotnet new install ./templates/ll-nuget
 dotnet new ll-nuget -n MiPaquete -o ../mi-paquete
 ```
 
-La plantilla `ll-api` restaura los paquetes `LL.*` desde GitHub Packages; `ll-blazor` y `ll-nuget` solo usan nuget.org. GitHub exige autenticación incluso para leer los paquetes públicos del feed: para `ll-api`, define `GITHUB_TOKEN` con permiso `read:packages` antes de restaurar.
+La plantilla `ll-api` restaura los paquetes `LL.*` desde GitHub Packages; `ll-blazor` y `ll-nuget` solo usan nuget.org. GitHub exige autenticación incluso para leer los paquetes públicos del feed: para `ll-api`, define `GH_PACKAGES_TOKEN` con permiso `read:packages` antes de restaurar. No uses `GITHUB_TOKEN`: `gh` y Git la leen como credencial de la sesión y un token sin `repo` deja los `push` en `403`.
 
 ```bash
-export GITHUB_TOKEN="$(gh auth token)"
+export GH_PACKAGES_TOKEN="<pat-de-solo-lectura>"
 cd ../mi-api
 dotnet restore MiApi.slnx
 dotnet build MiApi.slnx -c Release --no-restore

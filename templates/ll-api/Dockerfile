@@ -15,7 +15,7 @@ COPY ["src/CompanyApi.Domain/CompanyApi.Domain.csproj", "src/CompanyApi.Domain/"
 COPY ["src/CompanyApi.Application/CompanyApi.Application.csproj", "src/CompanyApi.Application/"]
 COPY ["src/CompanyApi.Infrastructure/CompanyApi.Infrastructure.csproj", "src/CompanyApi.Infrastructure/"]
 RUN --mount=type=secret,id=github_token \
-    GITHUB_TOKEN="$(cat /run/secrets/github_token)" \
+    GH_PACKAGES_TOKEN="$(cat /run/secrets/github_token)" \
     dotnet restore "src/CompanyApi.Api/CompanyApi.Api.csproj"
 
 COPY . .
