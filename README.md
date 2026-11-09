@@ -10,11 +10,13 @@ Una plantilla no es un control que la aplicación instala: es el esqueleto que l
 
 | Nombre corto | Qué crea | Estado |
 |---|---|---|
-| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validado |
+| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validado en generación; **Parcial** en CI de seguridad |
 | `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Validado |
 | `ll-nuget` | Biblioteca .NET empaquetable, con pruebas, CI, publicación por etiqueta y el README dentro del paquete | Validado |
 
 Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh`; en `ll-api` además se arranca la API y se comprueba que `/health` no trae la cabecera `Server`; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
+
+El CI de seguridad de la API generada —SAST, SCA, contenedor y revisión de dependencias— queda **Parcial** hasta que un repositorio generado con `ll-api` lo pase en verde. La generación, compilación, pruebas y formato de la plantilla sí están cubiertos por `verify-template.sh`.
 
 ## Uso
 
@@ -44,7 +46,8 @@ dotnet test MiApi.slnx -c Release --no-build --no-restore
 - `src/MiApi.Domain`, `src/MiApi.Application`, `src/MiApi.Infrastructure` y `src/MiApi.Api`, con la regla de dependencias `Domain ← Application ← Infrastructure ← Api`.
 - `Directory.Build.props` y `Directory.Packages.props`: una sola versión por paquete, fijada y auditada como error.
 - `LL.Security` y `LL.Hosting`: CORS con denegación por defecto, cabeceras de seguridad, límite por IP, ProblemDetails y salud anónima.
-- `.github/workflows/ci.yml` con la acción `dotnet` y Gitleaks de `core`.
+- `.github/workflows/ci.yml` con las acciones `dotnet`, `gitleaks`, `sast` y `scan` de `core`: compilación y pruebas, secretos, CodeQL, Trivy sobre dependencias e imagen y `dependency-review` en las pull requests.
+- El CI construye el contenedor, comprueba que no ejecuta como root y lo escanea; el análisis de IaC se añade cuando el repositorio incluya `infra/`.
 - Dependabot para NuGet y GitHub Actions, con auto-merge de parche y minor.
 - `Dockerfile` multi-stage, usuario no privilegiado y credencial del feed por secreto de BuildKit.
 
