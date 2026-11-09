@@ -13,7 +13,7 @@ API empresarial en .NET 10 creada desde la plantilla `ll-api`. Este archivo cubr
 - Security by Design y OWASP API Security Top 10.
 - Los controles compartidos se consumen desde `LL.Security` y `LL.Hosting`; no los reimplementes en el host.
 - CORS con denegación por defecto y orígenes explícitos.
-- Dockerfile con usuario no privilegiado (`USER $APP_UID`).
+- Dockerfile con usuario no privilegiado (`USER $APP_UID`). El CI construye la imagen, comprueba que no ejecuta como root y la escanea con Trivy; las dependencias se escanean con el mismo Trivy sobre los manifiestos.
 - Sin secretos ni cadenas reales en el código: `appsettings.Local.json` (ignorado), user-secrets o variables de entorno. `appsettings.Development.json` se versiona sin secretos.
 - Pruebas de integración en `tests/CompanyApi.Tests` para cualquier cambio de comportamiento.
 
@@ -34,7 +34,7 @@ ASPNETCORE_URLS=http://127.0.0.1:8099 dotnet run --project src/CompanyApi.Api --
 curl -sI http://127.0.0.1:8099/health | grep -i '^server:' && echo "publica Server" || echo "sin cabecera Server"
 ```
 
-Los pasos .NET y el escaneo de secretos se ejecutan con las acciones compartidas de `core` desde `.github/workflows/ci.yml`. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
+El CI usa las acciones de `core` para compilar, escanear secretos, analizar el código y escanear dependencias e imagen. El job de SCA restaura y compila antes de `scan`, como pide `core`; la construcción del contenedor, la comprobación de usuario no privilegiado y la revisión de dependencias van en el mismo workflow. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
 ## Commits
 

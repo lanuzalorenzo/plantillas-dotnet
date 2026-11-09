@@ -37,7 +37,7 @@ dotnet format CompanyApi.slnx --verify-no-changes --no-restore
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
-El CI llama a las acciones de [`core`](https://github.com/lanuzalorenzo/core) y restaura los paquetes de [`shared-dotnet`](https://github.com/lanuzalorenzo/shared-dotnet). La versión de `LL.*` está fijada en `Directory.Packages.props`; se sube a mano cuando `shared-dotnet` publica una versión nueva.
+El CI usa las acciones de [`core`](https://github.com/lanuzalorenzo/core) para compilar, escanear secretos, analizar el código y escanear dependencias e imagen; la construcción del contenedor, la comprobación de usuario no privilegiado y la revisión de dependencias van en el mismo workflow. Restaura los paquetes de [`shared-dotnet`](https://github.com/lanuzalorenzo/shared-dotnet). La versión de `LL.*` está fijada en `Directory.Packages.props`; se sube a mano cuando `shared-dotnet` publica una versión nueva.
 
 ## Docker
 

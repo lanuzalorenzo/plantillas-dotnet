@@ -13,7 +13,7 @@ Biblioteca .NET 10 publicable como paquete NuGet, creada desde la plantilla `ll-
 
 - Todo cambio de comportamiento entra con prueba en `tests/CompanyPackage.Tests`.
 - La API pública del paquete se documenta y no se rompe sin subir la versión mayor.
-- Los metadatos del paquete (`Description`, `PackageTags`, `PackageReadmeFile` y licencia) viven en el `.csproj` de la biblioteca; no se duplican en el workflow.
+- Los metadatos del paquete (`Description`, `PackageTags`, `PackageReadmeFile`) viven en el `.csproj` de la biblioteca; la licencia (`PackageLicenseExpression`) está en `Directory.Build.props` y no se duplica en el workflow.
 - Sin secretos versionados: la publicación usa `GITHUB_TOKEN` y el consumidor, un token con `read:packages`.
 - La versión se fija con `VersionPrefix` o con la etiqueta. `--skip-duplicate` evita republicar una versión existente.
 
