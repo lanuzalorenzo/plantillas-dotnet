@@ -7,7 +7,7 @@
   <ItemGroup Label="Aplicación">
     <!-- Versión exacta: una actualización de shared-dotnet pasa por el mismo CI. -->
     <PackageVersion Include="LL.Hosting" Version="0.1.0" />
-    <PackageVersion Include="LL.Security" Version="0.1.0" />
+    <PackageVersion Include="LL.Security" Version="0.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
   </ItemGroup>
 
