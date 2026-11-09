@@ -27,6 +27,13 @@ dotnet format CompanyApi.slnx --verify-no-changes --no-restore
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
+Las pruebas no ven la cabecera `Server` porque `TestServer` no la escribe. Para comprobarla, arranca la API y mira `/health`:
+
+```bash
+ASPNETCORE_URLS=http://127.0.0.1:8099 dotnet run --project src/CompanyApi.Api --no-launch-profile &
+curl -sI http://127.0.0.1:8099/health | grep -i '^server:' && echo "publica Server" || echo "sin cabecera Server"
+```
+
 Los pasos .NET y el escaneo de secretos se ejecutan con las acciones compartidas de `core` desde `.github/workflows/ci.yml`. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
 ## Commits

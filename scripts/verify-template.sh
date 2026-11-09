@@ -5,6 +5,7 @@
 set -euo pipefail
 
 command -v unzip >/dev/null || { echo "Falta unzip para comprobar el paquete" >&2; exit 1; }
+command -v curl >/dev/null || { echo "Falta curl para comprobar la cabecera Server" >&2; exit 1; }
 
 raiz="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 trabajo="$(mktemp -d)"
@@ -47,6 +48,42 @@ for plantilla in "$raiz"/templates/*; do
   fi
 
   dotnet format "$destino/Sample.slnx" --verify-no-changes --no-restore
+
+  # La API generada arranca con Kestrel y no debe anunciarse en la cabecera Server;
+  # la prueba no lo ve porque TestServer no escribe la cabecera.
+  if [ "$nombre" = "ll-api" ]; then
+    puerto=8099
+    ASPNETCORE_URLS="http://127.0.0.1:${puerto}" ASPNETCORE_ENVIRONMENT=Production \
+      dotnet run --project "$destino/src/Sample.Api" -c Release --no-build --no-launch-profile \
+      >/dev/null 2>&1 &
+    api_pid=$!
+
+    cabeceras=""
+    respondio=0
+    for _ in $(seq 1 30); do
+      if ! kill -0 "$api_pid" 2>/dev/null; then
+        break
+      fi
+      if cabeceras="$(curl -fsS -D - -o /dev/null --connect-timeout 1 --max-time 2 "http://127.0.0.1:${puerto}/health" 2>/dev/null)"; then
+        respondio=1
+        break
+      fi
+      sleep 1
+    done
+
+    kill "$api_pid" >/dev/null 2>&1 || true
+    wait "$api_pid" 2>/dev/null || true
+
+    if [ "$respondio" -ne 1 ]; then
+      echo "  La API generada no respondió en /health" >&2
+      exit 1
+    fi
+    if printf '%s\n' "$cabeceras" | grep -qiE '^server:'; then
+      echo "  La API generada publica la cabecera Server" >&2
+      exit 1
+    fi
+    echo "  /health sin cabecera Server"
+  fi
 
   # Empaquetar la solución si algún proyecto se declara publicable, con el mismo
   # comando que documenta la plantilla, y comprobar el contenido de cada .nupkg.

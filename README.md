@@ -14,7 +14,7 @@ Una plantilla no es un control que la aplicación instala: es el esqueleto que l
 | `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Validado |
 | `ll-nuget` | Biblioteca .NET empaquetable, con pruebas, CI, publicación por etiqueta y el README dentro del paquete | Validado |
 
-Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh` y en el CI; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
+Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh`; en `ll-api` además se arranca la API y se comprueba que `/health` no trae la cabecera `Server`; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
 
 ## Uso
 

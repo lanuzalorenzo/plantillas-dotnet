@@ -6,7 +6,7 @@ Plantillas de `dotnet new` que crean repositorios con la línea base del portfol
 
 - `templates/<nombre>/`: una plantilla. El contenido generado está en la raíz de la carpeta y la definición en `.template.config/template.json`.
 - `assets/iconos/`: icono del repositorio, con los valores en línea.
-- `scripts/verify-template.sh`: recorre las plantillas, instala cada una en un directorio temporal, genera el proyecto, restaura, compila, prueba y verifica el formato.
+- `scripts/verify-template.sh`: recorre las plantillas, instala cada una en un directorio temporal, genera el proyecto, restaura, compila, prueba, verifica el formato y comprueba que la API generada no publica la cabecera `Server`.
 - `.github/workflows/`: CI del repositorio y flujo de auto-merge de Dependabot.
 
 ## Reglas
