@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Multi-stage, imagen reducida y usuario no privilegiado.
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /src
 
 # La configuración y los csproj van primero para aprovechar la caché de capas.
@@ -21,7 +21,7 @@ RUN --mount=type=secret,id=github_token \
 COPY . .
 RUN dotnet publish "src/CompanyApi.Api/CompanyApi.Api.csproj" -c Release --no-restore -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:11.0 AS final
 WORKDIR /app
 
 # Parches del sistema operativo base en la construcción, sin listas de APT en la imagen final.
