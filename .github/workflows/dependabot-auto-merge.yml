@@ -63,6 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: Pedir a Dependabot que rebasee las PRs atrasadas
@@ -72,24 +73,37 @@ jobs:
         run: |
           set -euo pipefail
           if ! prs=$(gh pr list --state open --limit 100 \
-            --json number,author,baseRefName,mergeStateStatus,autoMergeRequest \
-            --jq '.[] | select(.author.login == "app/dependabot" and .baseRefName == "main" and .autoMergeRequest != null and .mergeStateStatus == "BEHIND") | .number'); then
+            --json number,author,baseRefName,mergeStateStatus \
+            --jq '.[] | select(.author.login == "app/dependabot" and .baseRefName == "main" and .mergeStateStatus == "BEHIND") | .number'); then
             echo "::error::No se pudo listar las PRs de Dependabot."
             exit 1
           fi
           if [ -z "$prs" ]; then
-            echo "::notice::No hay PRs de Dependabot con auto-merge y rama atrasada."
+            echo "::notice::No hay PRs de Dependabot atrasadas contra main."
             exit 0
+          fi
+          if ! base=$(gh api "repos/${GH_REPO}/git/ref/heads/main" --jq .object.sha); then
+            echo "::error::No se pudo leer el SHA de main."
+            exit 1
           fi
           while read -r pr; do
             [ -n "$pr" ] || continue
-            existing=$(gh pr view "$pr" --json comments \
-              --jq '[.comments[] | select(.body | contains("@dependabot rebase"))] | length')
-            if [ "$existing" -gt 0 ]; then
-              echo "::notice::La PR #${pr} ya tiene el aviso de rebase; no se repite."
+            if ! meta=$(gh pr view "$pr" --json headRefOid,comments); then
+              echo "::warning::No se pudo leer la PR #${pr}; se continúa."
+              continue
+            fi
+            head=$(jq -r '.headRefOid' <<< "$meta")
+            marker="<!-- rebase head=${head} base=${base} -->"
+            if jq -e --arg marker "$marker" \
+              '[.comments[] | select(.body | contains($marker))] | length > 0' \
+              <<< "$meta" >/dev/null; then
+              echo "::notice::La PR #${pr} ya tiene el aviso para este head/base."
               continue
             fi
             # Dependabot rebasea con su propia identidad, así que el push sí
-            # dispara el CI del PR y el auto-merge puede completarse.
-            gh pr comment "$pr" --body "@dependabot rebase"
+            # dispara el CI del PR; el auto-merge o el fallback pueden seguir.
+            if ! gh pr comment "$pr" --body "$(printf '@dependabot rebase\n\n%s' "$marker")"; then
+              echo "::warning::No se pudo comentar en la PR #${pr}; se continúa."
+              continue
+            fi
           done <<< "$prs"
