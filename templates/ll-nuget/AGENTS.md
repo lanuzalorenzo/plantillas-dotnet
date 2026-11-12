@@ -30,6 +30,10 @@ gitleaks detect --source . --redact --verbose --exit-code 2
 
 **Definición de cambio listo:** los seis comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
+## Dependabot
+
+Si una PR de Dependabot queda `BEHIND`, actualiza su rama con `gh api -X PUT repos/{owner}/{repo}/pulls/N/update-branch`; el push resultante dispara CI y el auto-merge la fusiona. No se automatiza con `GITHUB_TOKEN`: sus eventos no disparan workflows y Dependabot rechaza los comandos de `github-actions[bot]`.
+
 ## Commits
 
 Formato: `type(scope): imperative summary in English`. Scopes: `package`, `ci`, `tests`, `docs`, `repo`. Tipos: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
