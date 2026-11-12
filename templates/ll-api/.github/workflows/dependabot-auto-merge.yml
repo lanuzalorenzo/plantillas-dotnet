@@ -63,52 +63,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write
       pull-requests: write
-      actions: write
     steps:
-      - name: Poner al día las PRs abiertas de Dependabot
+      - name: Pedir a Dependabot que rebasee las PRs atrasadas
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          if ! prs=$(gh pr list --state open --limit 100 --json number,author,headRefName,baseRefName \
-            --jq '.[] | select(.author.login == "app/dependabot" and .baseRefName == "main") | "\(.number) \(.headRefName)"'); then
+          if ! prs=$(gh pr list --state open --limit 100 \
+            --json number,author,baseRefName,mergeStateStatus,autoMergeRequest \
+            --jq '.[] | select(.author.login == "app/dependabot" and .baseRefName == "main" and .autoMergeRequest != null and .mergeStateStatus == "BEHIND") | .number'); then
             echo "::error::No se pudo listar las PRs de Dependabot."
             exit 1
           fi
           if [ -z "$prs" ]; then
-            echo "::notice::No hay PRs abiertas de Dependabot contra main."
+            echo "::notice::No hay PRs de Dependabot con auto-merge y rama atrasada."
             exit 0
           fi
-          while read -r pr branch; do
+          while read -r pr; do
             [ -n "$pr" ] || continue
-            before=$(gh pr view "$pr" --json headRefOid -q .headRefOid)
-            if output=$(gh api -X PUT \
-              "repos/${GH_REPO}/pulls/${pr}/update-branch" \
-              -f expected_head_sha="$before" 2>&1); then
-              changed=false
-              for _ in $(seq 1 12); do
-                after=$(gh pr view "$pr" --json headRefOid -q .headRefOid)
-                if [ "$after" != "$before" ]; then
-                  changed=true
-                  break
-                fi
-                sleep 5
-              done
-              if [ "$changed" != true ]; then
-                echo "::warning::La PR #${pr} no cambió de head tras update-branch; no se despacha CI."
-                continue
-              fi
-              # El commit de update-branch lo firma GITHUB_TOKEN, así que su
-              # synchronize no dispara CI. Se lanza el workflow a mano sobre
-              # la rama ya actualizada.
-              gh workflow run ci.yml --ref "$branch"
-            elif printf '%s' "$output" | grep -qE 'merge conflict between base and head|already up to date|HTTP 422'; then
-              echo "::notice::PR #${pr} sin actualización: ${output}"
-            else
-              echo "::error::No se pudo actualizar la PR #${pr}: ${output}"
-              exit 1
+            existing=$(gh pr view "$pr" --json comments \
+              --jq '[.comments[] | select(.body | contains("@dependabot rebase"))] | length')
+            if [ "$existing" -gt 0 ]; then
+              echo "::notice::La PR #${pr} ya tiene el aviso de rebase; no se repite."
+              continue
             fi
+            # Dependabot rebasea con su propia identidad, así que el push sí
+            # dispara el CI del PR y el auto-merge puede completarse.
+            gh pr comment "$pr" --body "@dependabot rebase"
           done <<< "$prs"
