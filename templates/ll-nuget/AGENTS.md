@@ -32,7 +32,7 @@ gitleaks detect --source . --redact --verbose --exit-code 2
 
 ## Dependabot
 
-Si una PR de Dependabot queda `BEHIND`, actualiza su rama con `gh api -X PUT repos/{owner}/{repo}/pulls/N/update-branch`; el push resultante dispara CI y el auto-merge la fusiona. No se automatiza con `GITHUB_TOKEN`: sus eventos no disparan workflows y Dependabot rechaza los comandos de `github-actions[bot]`.
+Si una PR de Dependabot queda `BEHIND`, actualiza su rama con `gh api -X PUT repos/OWNER/REPO/pulls/N/update-branch`; el push resultante dispara CI y el auto-merge la fusiona. No se automatiza con `GITHUB_TOKEN`: sus eventos no disparan workflows y Dependabot rechaza los comandos de `github-actions[bot]`.
 
 ## Commits
 
