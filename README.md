@@ -16,7 +16,7 @@ Una plantilla no es un control que la aplicación instala: es el esqueleto que l
 
 Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh`; en `ll-api` además se arranca la API y se comprueba que `/health` no trae la cabecera `Server`; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
 
-El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y revisión de dependencias— se validó el 2026-11-14 en un repositorio temporal generado con `ll-api`: los seis trabajos pasaron en verde en el run `43586888595` (commit `736908a` del repositorio temporal), con las acciones de `core` fijadas a `v1.7`. El repositorio temporal se eliminó al cerrar la prueba. La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
+El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y revisión de dependencias— se validó el 2026-11-14 en un repositorio temporal generado con `ll-api`: los seis trabajos pasaron en verde en el run `43586888595` (commit `736908a` del repositorio temporal), con las acciones de `core` fijadas a `v1.7`. El repositorio temporal se archivó al cerrar la prueba y quedó pendiente de borrar por falta del permiso `delete_repo`. La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
 
 ## Uso
 
