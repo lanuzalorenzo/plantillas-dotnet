@@ -31,6 +31,14 @@ for plantilla in "$raiz"/templates/*; do
   dotnet new install "$plantilla" >/dev/null
   dotnet new "$nombre" -n Sample -o "$destino"
 
+  # La cabecera del README apunta a un archivo que tiene que viajar con la plantilla.
+  while IFS= read -r ruta; do
+    if [ ! -f "$destino/$ruta" ]; then
+      echo "  El README apunta a un icono que no existe: $ruta" >&2
+      exit 1
+    fi
+  done < <(grep -o 'src="[^"]*"' "$destino/README.md" | sed 's/^src="//;s/"$//' | grep -vE '^https?://' || true)
+
   dotnet restore "$destino/Sample.slnx"
   dotnet build "$destino/Sample.slnx" -c Release --no-restore
 
