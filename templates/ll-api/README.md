@@ -1,3 +1,5 @@
+<img src="assets/iconos/ll-api.svg" width="64" alt="Icono de la API">
+
 # CompanyApi
 
 API empresarial en .NET 10 con la línea base del portfolio: arquitectura por capas, compilación centralizada, controles compartidos, CI y contenedor sin privilegios.
