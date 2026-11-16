@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>Biblioteca NuGet</title>
-  <desc>Caja isométrica, por el paquete publicado en GitHub Packages.</desc>
+  <desc>Cubo isométrico con las juntas interiores, por el paquete publicado en GitHub Packages.</desc>
   <defs>
     <linearGradient id="bg-ll-nuget" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#07131e"/>
@@ -10,8 +10,6 @@
   <rect width="64" height="64" rx="16" fill="url(#bg-ll-nuget)"/>
   <rect x="1" y="1" width="62" height="62" rx="15" fill="none" stroke="#38bdf8" stroke-width="2"/>
   <g transform="translate(10 10) scale(1.83334)" fill="#f8fafc">
-    <path d="M12 2 L21 6.5 L12 11 L3 6.5 Z"/>
-    <path d="M3 8.7 L11 12.7 V21 L3 17 Z"/>
-    <path d="M13 12.7 L21 8.7 V17 L13 21 Z"/>
+    <path d="M12.00 2.00 L21.00 6.50 L21.00 16.50 L12.00 21.00 L3.00 16.50 L3.00 6.50 Z M12.20 10.50 L3.20 6.10 L2.80 6.90 L11.80 11.30 Z M12.20 11.30 L21.20 6.90 L20.80 6.10 L11.80 10.50 Z M11.55 10.90 L11.55 21.00 L12.45 21.00 L12.45 10.90 Z"/>
   </g>
 </svg>
