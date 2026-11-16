@@ -1,3 +1,5 @@
+<img src="assets/iconos/ll-blazor.svg" width="64" alt="Icono de la aplicación web">
+
 # CompanyWeb
 
 Aplicación Blazor WebAssembly en .NET 10 con la línea base del portfolio: compilación centralizada, pruebas, CI y contenedor nginx sin privilegios. Consume una API por HTTP; no contiene lógica de servidor ni secretos.

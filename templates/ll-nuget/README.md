@@ -1,3 +1,5 @@
+<img src="assets/iconos/ll-nuget.svg" width="64" alt="Icono de la biblioteca">
+
 # CompanyPackage
 
 Biblioteca .NET 10 publicable como paquete NuGet, creada con la línea base del portfolio: compilación centralizada, pruebas, CI y publicación por etiqueta en GitHub Packages.
