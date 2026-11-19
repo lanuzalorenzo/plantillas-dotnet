@@ -12,6 +12,7 @@ Plantillas de `dotnet new` que crean repositorios con la línea base del portfol
 ## Reglas
 
 - Una plantilla no duplica la lógica de `shared-dotnet`: la consume por versión publicada.
+- La versión de .NET, las actualizaciones mayores y las dependencias directas y transitivas siguen la [política de plataforma](https://github.com/lanuzalorenzo/core/blob/main/docs/versiones-y-dependencias.md): LTS, mayores de la familia bloqueados y pin de transitivas en el centro.
 - El contenido generado no cita repositorios privados, rutas del workspace ni documentos internos.
 - Sin secretos ni credenciales versionadas. En `templates/ll-api`, el `NuGet.config` lee `GH_PACKAGES_TOKEN` del entorno; `templates/ll-blazor` solo usa nuget.org.
 - La línea base de los repos públicos se aplica aquí sin excepción: Gitleaks sobre el historial completo, Dependabot con auto-merge de parche y minor, permisos mínimos y `main` con rama y pull request.
