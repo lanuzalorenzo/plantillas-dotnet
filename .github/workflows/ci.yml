@@ -74,4 +74,18 @@ jobs:
           fetch-depth: 0
 
       - name: Escanear secretos con Gitleaks
-        uses: lanuzalorenzo/core/actions/gitleaks@v1.6
+        uses: lanuzalorenzo/core/actions/gitleaks@v1.8
+
+  links:
+    name: Enlaces relativos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v7
+
+      - name: Comprobar enlaces
+        uses: lanuzalorenzo/core/actions/check-links@v1.8
+        with:
+          # El index.html de Blazor usa el marcador de fingerprint en
+          # `_framework/blazor.webassembly#[.{fingerprint}].js`; no es un enlace.
+          skip: templates/ll-blazor/src/CompanyWeb/wwwroot
