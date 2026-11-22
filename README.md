@@ -6,6 +6,10 @@ Plantillas de `dotnet new` que crean un repositorio con la línea base ya puesta
 
 Una plantilla no es un control que la aplicación instala: es el esqueleto que la crea. Los controles viven en `shared-dotnet` y se actualizan por versión. Esa separación está en el [ADR 0003](https://github.com/lanuzalorenzo/shared-dotnet/blob/main/docs/adr/0003-plantillas-fuera-del-repositorio.md) de `shared-dotnet`.
 
+## Guía
+
+Si vas a crear un proyecto, empieza por la [guía de plantillas](docs/guia-de-plantillas.md): el orden API → web, qué significa «segura de base» y cómo convertir el recorrido en una plantilla nueva para no repetirlo.
+
 ## Plantillas
 
 | Nombre corto | Qué crea | Estado |
