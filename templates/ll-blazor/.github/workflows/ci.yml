@@ -24,8 +24,11 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v7
 
+      - name: Comprobar la versión de plataforma
+        uses: lanuzalorenzo/core/actions/check-platform@v1.8
+
       - name: Compilar, verificar formato y probar
-        uses: lanuzalorenzo/core/actions/dotnet@v1.7
+        uses: lanuzalorenzo/core/actions/dotnet@v1.8
         with:
           solution: CompanyWeb.slnx
           dotnet-version: '10.0.x'
@@ -40,4 +43,4 @@ jobs:
           fetch-depth: 0
 
       - name: Escanear secretos con Gitleaks
-        uses: lanuzalorenzo/core/actions/gitleaks@v1.7
+        uses: lanuzalorenzo/core/actions/gitleaks@v1.8
