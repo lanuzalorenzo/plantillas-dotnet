@@ -14,7 +14,7 @@ Si vas a crear un proyecto, empieza por la [guía de plantillas](docs/guia-de-pl
 
 | Nombre corto | Qué crea | Estado |
 |---|---|---|
-| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validado |
+| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validado (revisión de dependencias sin ejercitar) |
 | `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Validado |
 | `ll-nuget` | Biblioteca .NET empaquetable, con pruebas, CI, publicación por etiqueta y el README dentro del paquete | Validado |
 
@@ -22,11 +22,11 @@ Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify
 
 El CI de la web generada —compilación, formato, pruebas y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-blazor`: los dos trabajos pasaron en verde en el run `45213388991` (commit `f29dc7a` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
 
-El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y la revisión de dependencias, que solo corre en las pull requests— se validó el 2026-11-23 en un repositorio temporal público generado con `ll-api`: los cinco trabajos que corren en un push pasaron en verde en el segundo intento del run `45213362682` (commit `285f180` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`; el primer intento, con el repositorio privado, falló en los tres trabajos que publican SARIF con «Resource not accessible by integration». La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
+El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y la revisión de dependencias, que solo corre en las pull requests— se validó el 2026-11-23 en un repositorio temporal público generado con `ll-api`: los cinco trabajos que corren en un push pasaron en verde en el segundo intento del run `45213362682` (commit `285f180` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`; la revisión de dependencias sigue sin ejercitar hasta que un repositorio generado reciba una pull request. El primer intento, con el repositorio aún privado, falló en los tres trabajos que publican SARIF: la publicación de hallazgos exige un repositorio público o GitHub Advanced Security. La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
 
 El CI de la biblioteca generada —compilación, formato, pruebas, paquete y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-nuget`: los dos trabajos pasaron en verde en el run `45213410774` (commit `e882543` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
 
-Los tres repositorios temporales se archivaron al cerrar la prueba y quedan pendientes de borrar por falta del permiso `delete_repo`; los de la web y la biblioteca eran privados, así que sus runs no son enlazables.
+Los tres repositorios temporales se archivaron al cerrar la prueba; los de la web y la biblioteca eran privados, así que sus runs no son enlazables.
 
 ## Uso
 
