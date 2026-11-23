@@ -20,9 +20,13 @@ Si vas a crear un proyecto, empieza por la [guía de plantillas](docs/guia-de-pl
 
 Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh`; en `ll-api` además se arranca la API y se comprueba que `/health` no trae la cabecera `Server`; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
 
-El CI de la web generada —compilación, formato, pruebas y secretos— se validó el 2026-11-22 en un repositorio temporal privado generado con `ll-blazor`: los dos trabajos pasaron en verde en el run `45014593085` (commit `8656b9a`), con las acciones de `core` fijadas a `v1.7`. El repositorio temporal se archivó al cerrar la prueba.
+El CI de la web generada —compilación, formato, pruebas y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-blazor`: los dos trabajos pasaron en verde en el run `45213388991` (commit `f29dc7a` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
 
-El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y revisión de dependencias— se validó el 2026-11-14 en un repositorio temporal generado con `ll-api`: los seis trabajos pasaron en verde en el run `43586888595` (commit `736908a` del repositorio temporal), con las acciones de `core` fijadas a `v1.7`. El repositorio temporal se archivó al cerrar la prueba y quedó pendiente de borrar por falta del permiso `delete_repo`. La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
+El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y la revisión de dependencias, que solo corre en las pull requests— se validó el 2026-11-23 en un repositorio temporal público generado con `ll-api`: los cinco trabajos que corren en un push pasaron en verde en el segundo intento del run `45213362682` (commit `285f180` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`; el primer intento, con el repositorio privado, falló en los tres trabajos que publican SARIF con «Resource not accessible by integration». La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
+
+El CI de la biblioteca generada —compilación, formato, pruebas, paquete y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-nuget`: los dos trabajos pasaron en verde en el run `45213410774` (commit `e882543` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
+
+Los tres repositorios temporales se archivaron al cerrar la prueba y quedan pendientes de borrar por falta del permiso `delete_repo`; los de la web y la biblioteca eran privados, así que sus runs no son enlazables.
 
 ## Uso
 
