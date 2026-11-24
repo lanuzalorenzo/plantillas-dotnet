@@ -16,6 +16,26 @@ updates:
       # Los paquetes LL.* viven en shared-dotnet. La versión está fijada a mano:
       # se sube cuando se publica una versión nueva y pasa el CI.
       - dependency-name: "LL.*"
+      # La familia de plataforma sigue al TargetFramework. Un mayor es una
+      # migración (política de plataforma), no una actualización.
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.EntityFrameworkCore.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.Data.Sqlite"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.JSInterop"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "System.Security.Cryptography.Pkcs"
+        update-types:
+          - "version-update:semver-major"
     groups:
       nuget-patch-minor:
         patterns:
@@ -41,6 +61,11 @@ updates:
     labels:
       - "dependencies"
       - "security"
+    # El mayor de .NET se cambia con la migración de plataforma, no aquí.
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       docker-patch-minor:
         patterns:
