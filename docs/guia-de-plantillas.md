@@ -168,7 +168,7 @@ El contenido generado va en la raíz de la carpeta, no dentro de una subcarpeta.
 ### 6.4 Contrato
 
 - La plantilla no duplica la lógica de `shared-dotnet`: la consume por versión publicada.
-- Una sola versión por paquete en `Directory.Packages.props`; la auditoría de dependencias falla la compilación ante una vulnerabilidad conocida.
+- Una sola versión por paquete en `Directory.Packages.props`; la auditoría de dependencias falla la compilación ante una vulnerabilidad alta o crítica y avisa ante una baja o moderada.
 - El contenido generado no cita repositorios privados, rutas del workspace ni documentos internos.
 - Sin secretos ni credenciales versionadas.
 - Dockerfile con usuario no privilegiado.

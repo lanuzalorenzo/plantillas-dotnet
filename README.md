@@ -66,7 +66,7 @@ dotnet test MiApi.slnx -c Release --no-build --no-restore
 ## Qué incluye la API generada
 
 - `src/MiApi.Domain`, `src/MiApi.Application`, `src/MiApi.Infrastructure` y `src/MiApi.Api`, con la regla de dependencias `Domain ← Application ← Infrastructure ← Api`.
-- `Directory.Build.props` y `Directory.Packages.props`: una sola versión por paquete, fijada y auditada como error.
+- `Directory.Build.props` y `Directory.Packages.props`: una sola versión por paquete, fijada, con auditoría que falla ante una vulnerabilidad alta o crítica y avisa en las bajas y moderadas.
 - `LL.Security` y `LL.Hosting`: CORS con denegación por defecto, cabeceras de seguridad, límite por IP, ProblemDetails y salud anónima.
 - `.github/workflows/ci.yml` con las acciones `dotnet`, `gitleaks`, `sast` y `scan` de `core`: compilación y pruebas, secretos, CodeQL, Trivy sobre dependencias e imagen y `dependency-review` en las pull requests.
 - El CI construye el contenedor, comprueba que no ejecuta como root y lo escanea. El análisis de IaC no es automático: queda manual hasta que el repositorio incluya `infra/`.
@@ -77,7 +77,7 @@ dotnet test MiApi.slnx -c Release --no-build --no-restore
 
 - `src/MiWeb`, una aplicación Blazor WebAssembly que consume la API por HTTP; la dirección vive en `wwwroot/appsettings.json`.
 - `tests/MiWeb.Tests`, con pruebas del cliente HTTP y un manejador falso.
-- `Directory.Build.props` y `Directory.Packages.props` con la compilación centralizada y una sola versión por paquete.
+- `Directory.Build.props` y `Directory.Packages.props` con la compilación centralizada, una sola versión por paquete y la misma auditoría: falla ante una vulnerabilidad alta o crítica y avisa en las bajas y moderadas.
 - `.github/workflows/ci.yml` con la acción `dotnet` y Gitleaks de `core`.
 - Dependabot para NuGet y GitHub Actions, con auto-merge de parche y minor.
 - `Dockerfile` con nginx sin privilegios y cabeceras de seguridad en `nginx.conf`.
@@ -86,7 +86,7 @@ dotnet test MiApi.slnx -c Release --no-build --no-restore
 
 - `src/MiPaquete`, una biblioteca empaquetable con `Slug` como ejemplo y el README dentro del `.nupkg`.
 - `tests/MiPaquete.Tests`, con pruebas de la biblioteca.
-- `Directory.Build.props` y `Directory.Packages.props` con la compilación centralizada, la versión y una sola versión por paquete.
+- `Directory.Build.props` y `Directory.Packages.props` con la compilación centralizada, la versión, una sola versión por paquete y la misma auditoría: falla ante una vulnerabilidad alta o crítica y avisa en las bajas y moderadas.
 - `.github/workflows/ci.yml` con la acción `dotnet`, Gitleaks de `core` y una comprobación de que el paquete contiene la biblioteca.
 - `.github/workflows/publish.yml`: una etiqueta `vX.Y.Z` compila, prueba, empaqueta y publica en GitHub Packages con `GITHUB_TOKEN`.
 - Dependabot para NuGet y GitHub Actions, con auto-merge de parche y minor.
