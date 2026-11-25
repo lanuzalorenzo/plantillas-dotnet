@@ -24,6 +24,15 @@
       ]
     }
   ],
+  "symbols": {
+    "imageName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "kebabCase",
+      "replaces": "company-api",
+      "description": "Nombre de la imagen del contenedor, derivado del nombre del proyecto."
+    }
+  },
   "tags": {
     "language": "C#",
     "type": "project"

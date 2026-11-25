@@ -59,7 +59,7 @@ No significa «con login». Significa que el proyecto nace con los controles que
 | Dockerfile sin privilegios | plantilla |
 | Compilación, formato y pruebas | `core/actions/dotnet` |
 | Gitleaks sobre el historial completo | `core/actions/gitleaks` |
-| CodeQL | `core/actions/sast` |
+| CodeQL | `github/codeql-action`, con publicación condicionada a la visibilidad |
 | Trivy sobre dependencias e imagen | `core/actions/scan` |
 | Contenedor sin root y revisión de dependencias | workflow generado |
 | Dependabot con auto-merge de parche y minor | plantilla |

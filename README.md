@@ -14,7 +14,7 @@ Si vas a crear un proyecto, empieza por la [guía de plantillas](docs/guia-de-pl
 
 | Nombre corto | Qué crea | Estado | Última ejecución real |
 |---|---|---|---|
-| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Validado (revisión de dependencias sin ejercitar) | 2026-11-23 · `285f180` · `v1.8` |
+| `ll-api` | API ASP.NET Core por capas, con pruebas, CI, Docker y los paquetes `LL.Security` y `LL.Hosting` | Parcial: el workflow nuevo (`sast` con `github/codeql-action` y nombre de imagen derivado) no se ha ejecutado; la revisión de dependencias sigue sin ejercitar | 2026-11-23 · `285f180` · `v1.8` (workflow anterior) |
 | `ll-blazor` | Aplicación Blazor WebAssembly con pruebas, CI y contenedor nginx sin privilegios | Parcial (SAST, SCA y contenedor sin ejercitar) | 2026-11-23 · `f29dc7a` · `v1.8` (CI anterior) |
 | `ll-nuget` | Biblioteca .NET empaquetable, con pruebas, CI, publicación por etiqueta y el README dentro del paquete | Parcial (SAST y SCA sin ejercitar) | 2026-11-23 · `e882543` · `v1.8` (CI anterior) |
 
@@ -24,17 +24,19 @@ Todas fijan la etiqueta en la referencia; ninguna usa `@main`.
 
 | Plantilla | Acciones de `core` |
 |---|---|
-| `ll-api` | `check-platform`, `dotnet`, `gitleaks`, `sast`, `scan` y `container-publish` |
+| `ll-api` | `check-platform`, `dotnet`, `gitleaks`, `scan` y `container-publish` |
 | `ll-blazor` | `check-platform`, `dotnet`, `gitleaks`, `sast`, `scan` y `container-publish` |
 | `ll-nuget` | `check-platform`, `dotnet`, `gitleaks`, `sast` y `scan` |
 
 Las tres plantillas ejecutan análisis estático con CodeQL y escaneo con Trivy; la web y la API construyen su imagen, comprueban que no ejecuta como root y la escanean. La biblioteca no tiene contenedor: su `scan` cubre las dependencias del paquete.
 
+En `ll-api` el SAST usa `github/codeql-action` directamente porque `core/actions/sast@v1.8` no permite condicionar la publicación del SARIF a la visibilidad del repositorio; vuelve a la acción compartida cuando `core` exponga ese conmutador.
+
 Las tres plantillas se generan, compilan, prueban y formatean en `scripts/verify-template.sh`; en `ll-api` además se arranca la API y se comprueba que `/health` no trae la cabecera `Server`; la de biblioteca se empaqueta además en ese recorrido. La publicación de `ll-nuget` se probó el 7 de noviembre de 2026 en un repositorio temporal: el workflow publicó el paquete `0.1.0` en GitHub Packages y el CI del repositorio generado quedó en verde.
 
 El CI de la web generada —compilación, formato, pruebas y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-blazor`: los dos trabajos pasaron en verde en el run `45213388991` (commit `f29dc7a` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
 
-El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y la revisión de dependencias, que solo corre en las pull requests— se validó el 2026-11-23 en un repositorio temporal público generado con `ll-api`: los cinco trabajos que corren en un push pasaron en verde en el segundo intento del run `45213362682` (commit `285f180` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`; la revisión de dependencias sigue sin ejercitar hasta que un repositorio generado reciba una pull request. El primer intento, con el repositorio aún privado, falló en los tres trabajos que publican SARIF: la publicación de hallazgos exige un repositorio público o GitHub Advanced Security. La generación, compilación, pruebas y formato de la plantilla siguen cubiertos por `verify-template.sh`.
+El CI de seguridad de la API generada —compilación, secretos, SAST, SCA, contenedor y la revisión de dependencias, que solo corre en las pull requests— se validó el 2026-11-23 en un repositorio temporal público generado con `ll-api`: los cinco trabajos que corren en un push pasaron en verde en el segundo intento del run `45213362682` (commit `285f180` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`; la revisión de dependencias sigue sin ejercitar hasta que un repositorio generado reciba una pull request. El primer intento, con el repositorio aún privado, falló en los tres trabajos que publican SARIF: la publicación de hallazgos exige un repositorio público o GitHub Advanced Security. Desde entonces la plantilla condiciona el envío de SARIF y `dependency-review` a `github.event.repository.visibility`, y el SAST pasó a los pasos de `github/codeql-action` con publicación condicionada: en privado el análisis y el escaneo siguen corriendo y solo se omite la publicación. Ninguna de las dos rutas se ha recorrido con este workflow en un repositorio temporal; la ejecución citada es de la versión anterior, así que la plantilla queda en Parcial. La generación, compilación, pruebas y formato siguen cubiertos por `verify-template.sh`.
 
 El CI de la biblioteca generada —compilación, formato, pruebas, paquete y secretos— se validó el 2026-11-23 en un repositorio temporal privado generado con `ll-nuget`: los dos trabajos pasaron en verde en el run `45213410774` (commit `e882543` del repositorio temporal), con las acciones de `core` fijadas a `v1.8`.
 
@@ -70,7 +72,7 @@ dotnet test MiApi.slnx -c Release --no-build --no-restore
 - `src/MiApi.Domain`, `src/MiApi.Application`, `src/MiApi.Infrastructure` y `src/MiApi.Api`, con la regla de dependencias `Domain ← Application ← Infrastructure ← Api`.
 - `Directory.Build.props` y `Directory.Packages.props`: una sola versión por paquete, fijada, con auditoría que falla ante una vulnerabilidad alta o crítica y avisa en las bajas y moderadas.
 - `LL.Security` y `LL.Hosting`: CORS con denegación por defecto, cabeceras de seguridad, límite por IP, ProblemDetails y salud anónima.
-- `.github/workflows/ci.yml` con las acciones `dotnet`, `gitleaks`, `sast` y `scan` de `core`: compilación y pruebas, secretos, CodeQL, Trivy sobre dependencias e imagen y `dependency-review` en las pull requests.
+- `.github/workflows/ci.yml` con las acciones `dotnet`, `gitleaks` y `scan` de `core` y CodeQL con `github/codeql-action`: compilación y pruebas, secretos, análisis estático, Trivy sobre dependencias e imagen y `dependency-review` en las pull requests.
 - El CI construye el contenedor, comprueba que no ejecuta como root y lo escanea. El análisis de IaC no es automático: queda manual hasta que el repositorio incluya `infra/`.
 - Dependabot para NuGet y GitHub Actions, con auto-merge de parche y minor.
 - `Dockerfile` multi-stage, usuario no privilegiado y credencial del feed por secreto de BuildKit.
