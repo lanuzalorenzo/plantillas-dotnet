@@ -76,9 +76,24 @@ No significa «con login». Significa que el proyecto nace con los controles que
 | El origen de la web se declara en el CORS de la API | configuración del consumidor |
 | Compilación, formato y pruebas | `core/actions/dotnet` |
 | Gitleaks sobre el historial completo | `core/actions/gitleaks` |
+| CodeQL | `core/actions/sast` |
+| Trivy sobre dependencias e imagen | `core/actions/scan` |
+| Contenedor sin root | workflow generado |
 | Dependabot con auto-merge de parche y minor | plantilla |
 
 **No entra:** autenticación, lógica de servidor ni secretos. Lo que se publica en `wwwroot` lo ve cualquiera.
+
+### Biblioteca (`ll-nuget`)
+
+| Control | Dónde vive |
+|---|---|
+| Compilación, formato, pruebas y paquete | `core/actions/dotnet` y el workflow generado |
+| Gitleaks sobre el historial completo | `core/actions/gitleaks` |
+| CodeQL | `core/actions/sast` |
+| Trivy sobre dependencias | `core/actions/scan` |
+| Dependabot con auto-merge de parche y minor | plantilla |
+
+**No entra:** un feed distinto de GitHub Packages: el paquete se publica por etiqueta en el feed del propietario y no hay contenedor que escanear.
 
 El inventario exacto, con los archivos, está en el [`README`](../README.md) y en el `AGENTS.md` del repositorio generado. Esta sección solo explica qué significa «base»; no repite el código, que vive en `templates/`.
 
@@ -181,7 +196,7 @@ El contenido generado va en la raíz de la carpeta, no dentro de una subcarpeta.
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
-El recorrido instala también `ll-api`, así que necesita `GH_PACKAGES_TOKEN` exportado, como en el [`README`](../README.md) §Uso. El script recorre todas las plantillas: instala cada una en un directorio temporal, genera un proyecto, restaura, compila, prueba, comprueba el formato, arranca la API y verifica que `/health` no publica `Server`, y empaqueta lo que se declare publicable.
+El recorrido instala también `ll-api`, así que necesita `GH_PACKAGES_TOKEN` exportado, como en el [`README`](../README.md) §Uso. El script recorre todas las plantillas: instala cada una en un directorio temporal, genera un proyecto, restaura, compila, prueba, comprueba el formato, verifica que el CI generado ejecuta `sast` y `scan` —y, cuando hay `Dockerfile`, que escanea la imagen y comprueba que no ejecuta como root—, arranca la API y verifica que `/health` no publica `Server`, y empaqueta lo que se declare publicable.
 
 Una plantilla que no puede generar, compilar y probar un proyecto no se publica. Y un recorrido verde en local no demuestra que el CI funcione: eso solo lo dice una ejecución real en un repositorio generado.
 

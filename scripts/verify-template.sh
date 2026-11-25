@@ -57,6 +57,31 @@ for plantilla in "$raiz"/templates/*; do
 
   dotnet format "$destino/Sample.slnx" --verify-no-changes --no-restore
 
+  # La línea base exige análisis estático y escaneo en todo artefacto: el CI que
+  # viaja con la plantilla tiene que ejecutarlos con las acciones de core.
+  for accion in sast scan; do
+    if ! grep -qE "^[[:space:]]*uses:[[:space:]]*lanuzalorenzo/core/actions/${accion}@" "$destino/.github/workflows/ci.yml"; then
+      echo "  El CI generado no ejecuta ${accion} de core" >&2
+      exit 1
+    fi
+  done
+
+  # Un artefacto con contenedor se escanea como imagen y se comprueba sin root.
+  if [ -f "$destino/Dockerfile" ]; then
+    if ! grep -qE '^[[:space:]]*scan-type:[[:space:]]*image' "$destino/.github/workflows/ci.yml"; then
+      echo "  El CI generado no escanea la imagen" >&2
+      exit 1
+    fi
+    if ! grep -qE '^[[:space:]]*image-ref:' "$destino/.github/workflows/ci.yml"; then
+      echo "  El CI generado no pasa la imagen al escaneo" >&2
+      exit 1
+    fi
+    if ! grep -q -- '--entrypoint id' "$destino/.github/workflows/ci.yml"; then
+      echo "  El CI generado no comprueba que el contenedor no ejecuta como root" >&2
+      exit 1
+    fi
+  fi
+
   # La API generada arranca con Kestrel y no debe anunciarse en la cabecera Server;
   # la prueba no lo ve porque TestServer no escribe la cabecera.
   if [ "$nombre" = "ll-api" ]; then

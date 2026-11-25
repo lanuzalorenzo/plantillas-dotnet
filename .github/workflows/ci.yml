@@ -61,6 +61,12 @@ jobs:
       - name: Construir la imagen
         run: docker build -t sample-web /tmp/sample-web
 
+      - name: Comprobar que el contenedor no ejecuta como root
+        run: |
+          container_uid="$(docker run --rm --entrypoint id sample-web -u)"
+          echo "UID del contenedor: ${container_uid}"
+          test "${container_uid}" != "0"
+
       - name: Comprobar la configuración de nginx
         run: docker run --rm sample-web nginx -t
 
