@@ -95,11 +95,17 @@ updates:
       actions-patch-minor:
         patterns:
           - "*"
+        # core queda fuera del grupo: al agrupar se repina a la versión
+        # objetivo y puede quedar por detrás de la referencia fijada a mano.
+        exclude-patterns:
+          - "lanuzalorenzo/core*"
         update-types:
           - "patch"
           - "minor"
       actions-major:
         patterns:
           - "*"
+        exclude-patterns:
+          - "lanuzalorenzo/core*"
         update-types:
           - "major"
