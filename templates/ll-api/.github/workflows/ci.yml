@@ -64,11 +64,29 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v7
 
-      - name: Analizar con CodeQL
-        uses: lanuzalorenzo/core/actions/sast@v1.8
+      - name: Configurar .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
         with:
           languages: csharp
-          dotnet-version: '10.0.x'
+          queries: security-extended
+
+      - name: Compilar para CodeQL
+        uses: github/codeql-action/autobuild@v4
+
+      # `core/actions/sast@v1.8` no permite separar análisis y publicación, así
+      # que los pasos van aquí: en un repositorio privado sin GitHub Advanced
+      # Security el SARIF no se puede subir, pero el análisis corre igual y su
+      # fallo bloquea. Solo se omite la publicación (`upload` es
+      # always/never/failure-only, no booleano).
+      - name: Analizar con CodeQL
+        uses: github/codeql-action/analyze@v4
+        with:
+          upload: ${{ github.event.repository.visibility == 'public' && 'always' || 'never' }}
 
   sca:
     name: Dependencias (Trivy)
@@ -99,6 +117,7 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          upload: ${{ github.event.repository.visibility == 'public' }}
 
   container-security:
     name: Contenedor (hardening y escaneo)
@@ -117,6 +136,9 @@ jobs:
 
       - name: Construir la imagen
         id: image
+        # El nombre de la imagen es el del proyecto, en kebab-case: la
+        # generación de la plantilla sustituye el nombre de ejemplo por el del
+        # proyecto creado.
         uses: lanuzalorenzo/core/actions/container-publish@v1.8
         with:
           image: company-api
@@ -138,10 +160,13 @@ jobs:
         with:
           scan-type: image
           image-ref: ${{ steps.image.outputs.tag }}
+          upload: ${{ github.event.repository.visibility == 'public' }}
 
   dependency-review:
     name: Revisión de dependencias (solo PR)
-    if: github.event_name == 'pull_request'
+    # Exige GitHub Advanced Security, que un repositorio privado no tiene: se
+    # activa el día que se publique, sin editar el workflow.
+    if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
     runs-on: ubuntu-latest
     permissions:
       contents: read

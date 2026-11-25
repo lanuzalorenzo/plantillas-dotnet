@@ -58,13 +58,17 @@ for plantilla in "$raiz"/templates/*; do
   dotnet format "$destino/Sample.slnx" --verify-no-changes --no-restore
 
   # La línea base exige análisis estático y escaneo en todo artefacto: el CI que
-  # viaja con la plantilla tiene que ejecutarlos con las acciones de core.
-  for accion in sast scan; do
-    if ! grep -qE "^[[:space:]]*uses:[[:space:]]*lanuzalorenzo/core/actions/${accion}@" "$destino/.github/workflows/ci.yml"; then
-      echo "  El CI generado no ejecuta ${accion} de core" >&2
-      exit 1
-    fi
-  done
+  # viaja con la plantilla tiene que ejecutarlos. `ll-api` declara CodeQL con
+  # `github/codeql-action` porque `core/actions/sast` no permite condicionar la
+  # publicación del SARIF a la visibilidad del repositorio.
+  if ! grep -qE "^[[:space:]]*uses:[[:space:]]*(lanuzalorenzo/core/actions/sast|github/codeql-action/analyze)@" "$destino/.github/workflows/ci.yml"; then
+    echo "  El CI generado no ejecuta análisis estático" >&2
+    exit 1
+  fi
+  if ! grep -qE "^[[:space:]]*uses:[[:space:]]*lanuzalorenzo/core/actions/scan@" "$destino/.github/workflows/ci.yml"; then
+    echo "  El CI generado no ejecuta scan de core" >&2
+    exit 1
+  fi
 
   # Un artefacto con contenedor se escanea como imagen y se comprueba sin root.
   if [ -f "$destino/Dockerfile" ]; then

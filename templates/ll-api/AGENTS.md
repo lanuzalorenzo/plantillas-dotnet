@@ -34,7 +34,7 @@ ASPNETCORE_URLS=http://127.0.0.1:8099 dotnet run --project src/CompanyApi.Api --
 curl -sI http://127.0.0.1:8099/health | grep -i '^server:' && echo "publica Server" || echo "sin cabecera Server"
 ```
 
-El CI usa las acciones de `core` para compilar, escanear secretos, analizar el código y escanear dependencias e imagen. El job de SCA restaura y compila antes de `scan`, como pide `core`; la construcción del contenedor, la comprobación de usuario no privilegiado y la revisión de dependencias van en el mismo workflow. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
+El CI usa las acciones de `core` para compilar, escanear secretos y escanear dependencias e imagen, y `github/codeql-action` para el análisis estático. El job de SCA restaura y compila antes de `scan`, como pide `core`; la construcción del contenedor, la comprobación de usuario no privilegiado y la revisión de dependencias van en el mismo workflow. El envío de SARIF y la revisión de dependencias solo corren con el repositorio público; en privado el análisis y el escaneo siguen corriendo y solo se omite la publicación. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
 ## Dependabot
 
