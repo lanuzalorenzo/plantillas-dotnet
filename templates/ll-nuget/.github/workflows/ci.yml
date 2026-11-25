@@ -54,3 +54,46 @@ jobs:
 
       - name: Escanear secretos con Gitleaks
         uses: lanuzalorenzo/core/actions/gitleaks@v1.8
+
+  sast:
+    name: Análisis estático (CodeQL)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v7
+
+      - name: Analizar con CodeQL
+        uses: lanuzalorenzo/core/actions/sast@v1.8
+        with:
+          languages: csharp
+          dotnet-version: '10.0.x'
+
+  sca:
+    name: Dependencias (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restaurar y compilar para generar los manifiestos
+        run: |
+          dotnet restore CompanyPackage.slnx
+          dotnet build CompanyPackage.slnx -c Release --no-restore
+
+      - name: Escanear dependencias con Trivy
+        uses: lanuzalorenzo/core/actions/scan@v1.8
+        with:
+          scan-type: fs
+          scan-ref: .

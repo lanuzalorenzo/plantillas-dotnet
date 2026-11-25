@@ -26,7 +26,7 @@ dotnet format CompanyWeb.slnx --verify-no-changes --no-restore
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
-Los pasos .NET y el escaneo de secretos se ejecutan con las acciones compartidas de `core` desde `.github/workflows/ci.yml`. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
+La compilación, las pruebas, el formato, los secretos, el análisis estático y el escaneo de dependencias y del contenedor se ejecutan con las acciones compartidas de `core` desde `.github/workflows/ci.yml`; el workflow construye la imagen, comprueba que no ejecuta como root y la escanea. La publicación del SARIF exige un repositorio público o GitHub Advanced Security; en un repositorio privado sin GHAS, esos trabajos fallan al subir los hallazgos. **Definición de cambio listo:** los cinco comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
 ## Dependabot
 

@@ -53,6 +53,8 @@ dotnet pack CompanyPackage.slnx -c Release --no-build
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
-El CI llama a la acción `dotnet` de [`core`](https://github.com/lanuzalorenzo/core) y escanea secretos con Gitleaks sobre el historial completo.
+El CI usa las acciones de [`core`](https://github.com/lanuzalorenzo/core): compila, prueba, verifica el formato y empaqueta con `dotnet`, escanea secretos con Gitleaks sobre el historial completo, analiza el código con CodeQL y escanea las dependencias con Trivy. El paquete no es una imagen: no hay contenedor que construir ni escanear.
+
+La publicación del SARIF exige un repositorio público o GitHub Advanced Security: en un repositorio privado sin GHAS, los trabajos `sast` y `sca` fallan al subir los hallazgos.
 
 Licencia: MIT.

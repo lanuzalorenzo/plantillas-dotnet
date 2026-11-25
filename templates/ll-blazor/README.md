@@ -32,7 +32,9 @@ dotnet format CompanyWeb.slnx --verify-no-changes --no-restore
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
-El CI llama a la acción `dotnet` de [`core`](https://github.com/lanuzalorenzo/core) y escanea secretos con Gitleaks sobre el historial completo.
+El CI usa las acciones de [`core`](https://github.com/lanuzalorenzo/core): compila, prueba y verifica el formato con `dotnet`, escanea secretos con Gitleaks sobre el historial completo, analiza el código con CodeQL y escanea dependencias e imagen con Trivy. También construye la imagen y comprueba que el contenedor no ejecuta como root.
+
+La publicación del SARIF exige un repositorio público o GitHub Advanced Security: en un repositorio privado sin GHAS, los trabajos de análisis y escaneo fallan al subir los hallazgos.
 
 ## Docker
 

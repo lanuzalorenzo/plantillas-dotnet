@@ -28,6 +28,8 @@ dotnet pack CompanyPackage.slnx -c Release --no-build
 gitleaks detect --source . --redact --verbose --exit-code 2
 ```
 
+La compilación, las pruebas, el formato, los secretos, el análisis estático y el escaneo de dependencias se ejecutan con las acciones compartidas de `core` desde `.github/workflows/ci.yml`. La publicación del SARIF exige un repositorio público o GitHub Advanced Security; en un repositorio privado sin GHAS, `sast` y `sca` fallan al subir los hallazgos.
+
 **Definición de cambio listo:** los seis comandos anteriores sin fallos y el pipeline en verde, sin bypass.
 
 ## Dependabot
