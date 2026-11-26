@@ -203,7 +203,7 @@ builder.Services.AddHardenedJwtBearer(options =>
 builder.Services.AddAuthorization();
 ```
 
-Los valores viven en configuración por entorno, nunca en el repositorio. Con `LL.Security` 0.3.0 llega el JWT endurecido; la política por permiso y el emisor local de prueba van en 0.4.0. Hasta entonces, la autorización se declara con las políticas que el token ya trae. La prueba de contrato cubre los dos caminos: 401 sin token y 403 con token sin el permiso.
+Los valores viven en configuración por entorno, nunca en el repositorio. Con `LL.Security` 0.4.0 la política por permiso y el emisor local de prueba están publicados; el permiso viaja como rol de aplicación (`ClaimTypes.Role`), no como un claim `permissions`, y las políticas se declaran sobre esos roles. La prueba de contrato cubre los dos caminos: 401 sin token y 403 con token sin el permiso.
 
 ### Observabilidad
 
