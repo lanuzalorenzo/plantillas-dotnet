@@ -4,7 +4,7 @@
 >
 > **Qué resuelve:** el recorrido completo: elegir la pieza, generar el proyecto, comprobarlo y, si el recorrido se repite, convertirlo en plantilla. Fija el orden y los criterios; los comandos exactos están en el `README` y en el `AGENTS.md` generado.
 >
-> **Estado:** Runbook preparado (2026-11-22). Las tres están cubiertas por `verify-template.sh`; el estado y su evidencia están en la tabla del [`README`](../README.md). Este documento describe cómo se hace una nueva y no se ha ejecutado todavía para crear una plantilla desde cero.
+> **Estado:** Validado (2026-11-26) para crear y publicar una aplicación desde una plantilla: el recorrido se siguió en un repositorio temporal público, con el primer PR fusionado y la línea base comprobada ([run 45783959428](https://github.com/lanuzalorenzo/r07-guia-api/actions/runs/45783959428)). Runbook preparado para convertir el recorrido en una plantilla nueva: ese tramo no se ha ejecutado desde cero.
 
 La idea cabe en una frase: **la plantilla crea la casa, el paquete mantiene la instalación y el inspector comprueba antes de abrir.** Por eso son tres repositorios y no uno: este crea el esqueleto, [`shared-dotnet`](https://github.com/lanuzalorenzo/shared-dotnet) mantiene los controles por versión y [`core`](https://github.com/lanuzalorenzo/core) ejecuta las comprobaciones. El motivo está en el [ADR 0003](https://github.com/lanuzalorenzo/shared-dotnet/blob/main/docs/adr/0003-plantillas-fuera-del-repositorio.md).
 
@@ -99,6 +99,12 @@ El inventario exacto, con los archivos, está en el [`README`](../README.md) y e
 
 ## 4. Genera y comprueba el proyecto
 
+### Las opciones de cada pieza
+
+`dotnet new` trae las opciones comunes: `-n` para el nombre, `-o` para el directorio de salida y `--dry-run` para ver qué escribiría sin escribir. Las plantillas no añaden opciones propias: el nombre de la imagen del contenedor se deriva del nombre del proyecto en kebab-case y no se pide. `dotnet new ll-api --help` lista lo que acepta la versión instalada; si no coincide con esto, la plantilla instalada es otra.
+
+### API
+
 ```bash
 dotnet new install ./templates/ll-api
 dotnet new ll-api -n MiApi -o ../mi-api
@@ -146,11 +152,87 @@ Después, antes de compilar:
 2. Añade el origen de la web a `Cors:AllowedOrigins` de la API. No se relaja la denegación por defecto: se declara el origen concreto.
 3. Pasa las mismas comprobaciones que en la API (`restore`, `build`, `test`, `format` y Gitleaks). `ll-blazor` no necesita `GH_PACKAGES_TOKEN` porque solo usa nuget.org.
 
+### La línea base en el `AGENTS.md`
+
+Un repositorio no está completo porque compile: tiene que declarar qué controles tiene y con qué evidencia. La sección `## Línea base` del `AGENTS.md` es una tabla con `Id`, `Estado` y `Evidencia`; la acción `check-linea-base` la lee junto con los workflows y falla si una fila `Validado` no tiene una evidencia localizable o si el CI no la respalda.
+
+La plantilla no trae la sección ni la comprobación: se añaden en el primer cambio, junto a los enlaces. Este es el job que se añade al workflow generado:
+
+```yaml
+  linea-base:
+    name: Línea base y enlaces
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: lanuzalorenzo/core/actions/check-links@v1.4
+      - uses: lanuzalorenzo/core/actions/check-linea-base@v1.9
+```
+
+Mientras el primer pipeline no esté en verde, los controles que dependen de él quedan `Pendiente`. Cuando lo esté, se pasan a `Validado` con el `run` o la PR en la evidencia y se repite la comprobación; `Parcial` es para lo diseñado que todavía no se ha ejecutado en ese repositorio, y no se disfraza de `Validado`. Así quedó la tabla en el recorrido de esta guía, con el run del primer PR:
+
+| Id | Estado | Evidencia |
+|---|---|---|
+| `secretos` | Validado | Gitleaks sobre el historial completo; run 45783293163. |
+| `dependabot` | Validado | `.github/dependabot.yml` cubre NuGet y GitHub Actions; `.github/workflows/dependabot-auto-merge.yml` fusiona parche y minor. |
+| `permisos` | Validado | `contents: read` en la raíz de cada workflow; escritura solo en el job que sube SARIF o comenta la PR. |
+| `sca` | Validado | Trivy sobre las dependencias; run 45783293163. |
+| `sast` | Validado | CodeQL en el job «Análisis estático»; run 45783293163. |
+| `contenedor` | Validado | Imagen construida, usuario no privilegiado y Trivy sobre la imagen; run 45783293163. |
+| `enlaces` | Validado | `check-links` sobre README y `AGENTS.md`; run 45783293163. |
+| `main` | Pendiente | `regla-rama` al crear el remoto; el repositorio de la prueba no la aplica porque se archiva. |
+
+`check-linea-base` necesita que el workflow del auto-merge declare permisos en la raíz; si falta, da `LB103`. La plantilla lo trae sin esa línea y se añade en el mismo cambio:
+
+```yaml
+permissions:
+  contents: read
+```
+
+### Autenticación
+
+La plantilla no monta autenticación: no puede inventar el emisor ni la audiencia, y arrancar con marcadores produce un servicio que falla en la primera petición. Se activa cuando existen el tenant y la aplicación:
+
+```csharp
+builder.Services.AddHardenedJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["AzureAd:Authority"]!;
+    options.Audience = builder.Configuration["AzureAd:Audience"]!;
+});
+builder.Services.AddAuthorization();
+```
+
+Los valores viven en configuración por entorno, nunca en el repositorio. Con `LL.Security` 0.3.0 llega el JWT endurecido; la política por permiso y el emisor local de prueba van en 0.4.0. Hasta entonces, la autorización se declara con las políticas que el token ya trae. La prueba de contrato cubre los dos caminos: 401 sin token y 403 con token sin el permiso.
+
+### Observabilidad
+
+Hoy la base trae ProblemDetails y un `/health` anónimo; los registros van a consola. `LL.Observabilidad` —trazas y métricas con el identificador del evento como correlación y la carga redactada— es el control siguiente y todavía no está publicado, así que ningún repositorio nuevo puede instalarlo. Mientras llega:
+
+- una línea por cambio de estado, con el identificador del recurso y sin la carga;
+- el identificador de correlación de la petición en cada línea;
+- `/health` para el proceso y `/health/ready` para la base, si la hay; un atraso de la cola no es una avería.
+
+Cuando se publique, se engancha por versión y la sección `## Línea base` gana su fila; no se copia el código.
+
 ## 5. Publícalo
 
 El repositorio remoto nace con `main` protegida, rama y pull request, checks obligatorios y Dependabot. La regla de rama se aplica con la acción `regla-rama` de `core`, no marcando casillas a mano. El procedimiento completo, con las comprobaciones y el orden, está en [`core/docs/crear-un-repositorio.md`](https://github.com/lanuzalorenzo/core/blob/main/docs/crear-un-repositorio.md); la apertura a público, en [`core/docs/publicar-un-repositorio.md`](https://github.com/lanuzalorenzo/core/blob/main/docs/publicar-un-repositorio.md).
 
 Regla que no se salta: **nunca push directo a `main`**, ni siquiera el primero. El primer cambio entra por rama y pull request.
+
+El esqueleto se sube en una rama y se abre la PR; los checks corren sobre ella y se fusiona con squash cuando están en verde:
+
+```bash
+git switch -c feat/esqueleto
+git push -u origin feat/esqueleto
+gh pr create --base main --fill
+gh pr merge --squash --delete-branch
+```
+
+Con el run de la PR en la mano se cierra el círculo: la sección `## Línea base` pasa a `Validado` donde tenga evidencia, se enlaza el run o la PR y se repite hasta que `check-linea-base` no tenga hallazgos. Ese run es lo que separa «genera y compila» de «el CI funciona»; sin él, la pieza es **Parcial**.
+
+La revisión de dependencias compara la PR con el grafo de la rama base. En la PR que crea el repositorio, la base solo tiene el README inicial y todavía no hay grafo: el job falla con un 403 que no viene del código. Se deja constancia, se fusiona el esqueleto con los demás checks en verde y la revisión se ejercita en la PR siguiente. No se desactiva el job ni se hace un push directo a `main` para evitarlo.
 
 ## 6. Convierte el recorrido en plantilla
 
@@ -217,6 +299,9 @@ Una plantilla nueva no se declara **Validado** por compilar en local. El estado 
 - [ ] `verify-template.sh` termina sin fallos y Gitleaks no encuentra nada.
 - [ ] El primer CI en un repositorio generado pasa en verde antes de declarar **Validado**.
 - [ ] La tabla del README y la estructura de `AGENTS.md` están al día.
+- [ ] La sección `## Línea base` declara los controles y `check-linea-base` termina sin hallazgos.
+- [ ] La autenticación no está montada sin emisor y audiencia reales; la observabilidad pendiente figura como tal.
+- [ ] El primer PR está fusionado con squash y su run enlazado en la línea base.
 
 ## 8. Dónde está la verdad
 
